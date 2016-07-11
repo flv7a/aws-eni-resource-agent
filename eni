@@ -131,17 +131,23 @@ eni_start() {
 	return $OCF_SUCCESS
     fi
     /usr/bin/aws ec2 attach-network-interface --network-interface-id ${OCF_RESKEY_interface_id} --instance-id ${instance_id} --device-index ${OCF_RESKEY_device_index}
-    sleep ${OCF_RESKEY_wait}
+    #sleep ${OCF_RESKEY_wait}
+    sleep 5
 
-    private_ip=`ifconfig ${OCF_RESKEY_device_name} | grep "inet addr:" | awk -F: '{ print $2 }' | awk '{ print $1 }'`
-    ip rule add from ${private_ip} table ${OCF_RESKEY_table_id} prio ${OCF_RESKEY_table_priority}
-    ip route add via ${OCF_RESKEY_gateway} dev ${OCF_RESKEY_device_name} src ${private_ip} table ${OCF_RESKEY_table_id}
+    private_ip="10.0.105.21"
+    private_ip_netmask="255.255.252.0"
+
+    /sbin/ifconfig ${OCF_RESKEY_device_name} ${private_ip} netmask ${private_ip_netmask} up
+
+    #private_ip=`ifconfig ${OCF_RESKEY_device_name} | grep "inet addr:" | awk -F: '{ print $2 }' | awk '{ print $1 }'`
+    #ip rule add from ${private_ip} table ${OCF_RESKEY_table_id} prio ${OCF_RESKEY_table_priority}
+    #ip route add via ${OCF_RESKEY_gateway} dev ${OCF_RESKEY_device_name} src ${private_ip} table ${OCF_RESKEY_table_id}
 }
 
 eni_stop() {
     eni_monitor
     if [ $? =  $OCF_SUCCESS ]; then
-        ip rule del table ${OCF_RESKEY_table_id}
+        #ip rule del table ${OCF_RESKEY_table_id}
         attachment_id=`/usr/bin/aws ec2 describe-network-interfaces --network-interface-ids ${OCF_RESKEY_interface_id} --filter "Name=attachment.instance-id, Values=${instance_id}" --output json | grep \"AttachmentId\": | sed -e 's/'.*\"AttachmentId\"':\s\"\(.*\)\"\,\s$/\1/'`
         /usr/bin/aws ec2 detach-network-interface --attachment-id ${attachment_id} 
         sleep ${OCF_RESKEY_wait}
