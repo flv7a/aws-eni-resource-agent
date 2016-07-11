@@ -70,6 +70,23 @@ The name of the device for the network interface attachment.
 <content type="string" default="eth1" />
 </parameter>
 
+<parameter name="private_ip" required="1">
+<longdesc lang="en">
+The private ip address for the network interface attachment.
+</longdesc>
+<shortdesc lang="en">private ip</shortdesc>
+<content type="string" />
+</parameter>
+
+<parameter name="netmask" required="1">
+<longdesc lang="en">
+The netmask for the network interface attachment.
+</longdesc>
+<shortdesc lang="en">netmask</shortdesc>
+<content type="string" />
+</parameter>
+
+
 <parameter name="gateway" required="1">
 <longdesc lang="en">
 The gateway of the device for the network interface attachment.
@@ -139,10 +156,11 @@ eni_start() {
     /usr/bin/aws ec2 attach-network-interface --network-interface-id ${OCF_RESKEY_interface_id} --instance-id ${instance_id} --device-index ${OCF_RESKEY_device_index}
     sleep ${OCF_RESKEY_wait}
 
-    private_ip="10.0.106.25"
-    private_ip_netmask="255.255.252.0"
+    #private_ip="10.0.106.25"
+    #private_ip_netmask="255.255.252.0"
 
-    /sbin/ifconfig ${OCF_RESKEY_device_name} ${private_ip} netmask ${private_ip_netmask} up
+    #/sbin/ifconfig ${OCF_RESKEY_device_name} ${private_ip} netmask ${private_ip_netmask} up
+    /sbin/ifconfig ${OCF_RESKEY_device_name} ${OCF_RESKEY_private_ip} netmask ${OCF_RESKEY_netmask} up
 
     #private_ip=`ifconfig ${OCF_RESKEY_device_name} | grep "inet addr:" | awk -F: '{ print $2 }' | awk '{ print $1 }'`
     #ip rule add from ${private_ip} table ${OCF_RESKEY_table_id} prio ${OCF_RESKEY_table_priority}
