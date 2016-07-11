@@ -145,8 +145,8 @@ eni_start() {
 }
 
 eni_stop() {
-    eni_monitor
-    if [ $? =  $OCF_SUCCESS ]; then
+    #eni_monitor
+    #if [ $? =  $OCF_SUCCESS ]; then
         #ip rule del table ${OCF_RESKEY_table_id}
 	#This doesn't work if the stop doesn't occur on the active machine
         #attachment_id=`/usr/bin/aws ec2 describe-network-interfaces --network-interface-ids ${OCF_RESKEY_interface_id} --filter "Name=attachment.instance-id, Values=${instance_id}" --output json | grep \"AttachmentId\": | sed -e 's/'.*\"AttachmentId\"':\s\"\(.*\)\"\,\s$/\1/'`
@@ -155,7 +155,7 @@ eni_stop() {
         /usr/bin/aws ec2 detach-network-interface --attachment-id ${attachment_id} 
         #sleep ${OCF_RESKEY_wait}
 	sleep 10
-    fi
+    #fi
     return $OCF_SUCCESS
 }
 
