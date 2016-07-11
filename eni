@@ -134,7 +134,7 @@ eni_start() {
     #sleep ${OCF_RESKEY_wait}
     sleep 5
 
-    private_ip="10.0.105.21"
+    private_ip="10.0.106.25"
     private_ip_netmask="255.255.252.0"
 
     /sbin/ifconfig ${OCF_RESKEY_device_name} ${private_ip} netmask ${private_ip_netmask} up
