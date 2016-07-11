@@ -130,6 +130,12 @@ eni_start() {
     if [ $? =  $OCF_SUCCESS ]; then
 	return $OCF_SUCCESS
     fi
+     
+    #Detach existing
+    attachment_id=`/usr/bin/aws ec2 describe-network-interfaces --network-interface-ids ${OCF_RESKEY_interface_id} --query 'NetworkInterfaces[0].Attachment' --output json | grep \"AttachmentId\": | sed -e 's/'.*\"AttachmentId\"':\s\"\(.*\)\"\,\s$/\1/'`
+    /usr/bin/aws ec2 detach-network-interface --attachment-id ${attachment_id}
+    sleep 15
+
     /usr/bin/aws ec2 attach-network-interface --network-interface-id ${OCF_RESKEY_interface_id} --instance-id ${instance_id} --device-index ${OCF_RESKEY_device_index}
     #sleep ${OCF_RESKEY_wait}
     sleep 5
