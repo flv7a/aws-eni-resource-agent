@@ -151,7 +151,7 @@ eni_stop() {
         attachment_id=`/usr/bin/aws ec2 describe-network-interfaces --network-interface-ids ${OCF_RESKEY_interface_id} --filter "Name=attachment.instance-id, Values=${instance_id}" --output json | grep \"AttachmentId\": | sed -e 's/'.*\"AttachmentId\"':\s\"\(.*\)\"\,\s$/\1/'`
         /usr/bin/aws ec2 detach-network-interface --attachment-id ${attachment_id} 
         #sleep ${OCF_RESKEY_wait}
-	sleep 5
+	sleep 10
     fi
     return $OCF_SUCCESS
 }
