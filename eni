@@ -156,10 +156,6 @@ eni_start() {
     /usr/bin/aws ec2 attach-network-interface --network-interface-id ${OCF_RESKEY_interface_id} --instance-id ${instance_id} --device-index ${OCF_RESKEY_device_index}
     sleep ${OCF_RESKEY_wait}
 
-    #private_ip="10.0.106.25"
-    #private_ip_netmask="255.255.252.0"
-
-    #/sbin/ifconfig ${OCF_RESKEY_device_name} ${private_ip} netmask ${private_ip_netmask} up
     /sbin/ifconfig ${OCF_RESKEY_device_name} ${OCF_RESKEY_private_ip} netmask ${OCF_RESKEY_netmask} up
 
     #private_ip=`ifconfig ${OCF_RESKEY_device_name} | grep "inet addr:" | awk -F: '{ print $2 }' | awk '{ print $1 }'`
@@ -177,7 +173,6 @@ eni_stop() {
 	
         /usr/bin/aws ec2 detach-network-interface --attachment-id ${attachment_id} 
         sleep ${OCF_RESKEY_wait}
-	#sleep 10
     fi
     return $OCF_SUCCESS
 }
