@@ -158,21 +158,22 @@ eni_start() {
 
     /sbin/ifconfig ${OCF_RESKEY_device_name} ${OCF_RESKEY_private_ip} netmask ${OCF_RESKEY_netmask} up
 
+    # These multihomed routing additions were needed because the CentOS AMI didn't have the necessary hotplug support.
+    # Depending on the specific AMI used, they may not be necessary
     ip rule add from ${OCF_RESKEY_private_ip} table ${OCF_RESKEY_table_id} prio ${OCF_RESKEY_table_priority}
     ip route add default via ${OCF_RESKEY_gateway} dev ${OCF_RESKEY_device_name} table ${OCF_RESKEY_table_id}
     ip route add default via ${OCF_RESKEY_gateway} dev ${OCF_RESKEY_device_name} metric ${OCF_RESKEY_table_priority}
 
-    #ip rule add from ${private_ip} table ${OCF_RESKEY_table_id} prio ${OCF_RESKEY_table_priority}
-    #ip route add via ${OCF_RESKEY_gateway} dev ${OCF_RESKEY_device_name} src ${private_ip} table ${OCF_RESKEY_table_id}
 }
 
 eni_stop() {
     eni_monitor
     if [ $? =  $OCF_SUCCESS ]; then
+	# These multihomed routing additions were needed because the CentOS AMI didn't have the necessary hotplug support.
+        # Depending on the specific AMI used, they may not be necessary
 	ip rule delete from ${OCF_RESKEY_private_ip} table ${OCF_RESKEY_table_id} prio ${OCF_RESKEY_table_priority}
     	ip route delete default via ${OCF_RESKEY_gateway} dev ${OCF_RESKEY_device_name} table ${OCF_RESKEY_table_id}
     	ip route delete default via ${OCF_RESKEY_gateway} dev ${OCF_RESKEY_device_name} metric ${OCF_RESKEY_table_priority}
-        #ip rule del table ${OCF_RESKEY_table_id}
 	#This doesn't work if the stop doesn't occur on the active machine -- need to determine if that matters,reverting for now.
         attachment_id=`/usr/bin/aws ec2 describe-network-interfaces --network-interface-ids ${OCF_RESKEY_interface_id} --filter "Name=attachment.instance-id, Values=${instance_id}" --output json | grep \"AttachmentId\": | sed -e 's/'.*\"AttachmentId\"':\s\"\(.*\)\"\,\s$/\1/'`
         #attachment_id=`/usr/bin/aws ec2 describe-network-interfaces --network-interface-ids ${OCF_RESKEY_interface_id} --query 'NetworkInterfaces[0].Attachment' --output json | grep \"AttachmentId\": | sed -e 's/'.*\"AttachmentId\"':\s\"\(.*\)\"\,\s$/\1/'`
